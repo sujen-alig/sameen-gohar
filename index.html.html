@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>Register</h1>
+    <form id="registerForm">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Enter your username" required />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" required />
+      </div>
+
+      <button type="submit" class="btn">Register</button>
+    </form>
+
+    <div class="login-link">
+      <p>Already have an account? <a href="login.html">Login here</a></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (username && email && password) {
+        const newUser = { username, email, password, timestamp: new Date().toISOString(), status: 'Pending' };
+
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users));
+
+        alert('Registration successful! Data has been sent to admin for approval.');
+        window.location.href = 'login.html';  // Redirect to login page after registration
+      } else {
+        alert('Please fill in all fields.');
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Action Log</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2.8rem;
+      color: #00e676;
+      text-shadow: 2px 2px #000;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    button {
+      background-color: #2c3e50;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 18px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s, background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #34495e;
+      transform: translateY(-3px);
+    }
+
+    .input-area {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 1rem;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 2px solid #ddd;
+      width: 250px;
+    }
+
+    .log-list {
+      margin-top: 30px;
+      width: 100%;
+      max-width: 1000px;
+      overflow-y: auto;
+      max-height: 300px;
+    }
+
+    .log-item {
+      background-color: #1b2838;
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .log-item p {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Action Log</h1>
+
+  <div class="actions">
+    <button class="right-btn" onclick="logAction('Right')">✅ Right</button>
+    <button class="wrong-btn" onclick="logAction('Wrong')">❌ Wrong</button>
+  </div>
+
+  <div class="input-area">
+    <label for="reason">Reason:</label>
+    <input type="text" id="reason" placeholder="Enter reason for the action">
+    <button onclick="saveAction()">Save Action</button>
+  </div>
+
+  <div class="log-list" id="logList">
+    <!-- Log entries will be displayed here -->
+  </div>
+
+  <script>
+    // Retrieve stored actions from localStorage or set as an empty array
+    let actions = JSON.parse(localStorage.getItem("actions")) || [];
+
+    function logAction(type) {
+      // Get the reason from the input field
+      const reason = document.getElementById("reason").value.trim();
+      
+      // Get the current timestamp
+      const timestamp = new Date().toLocaleString();
+
+      // If reason is empty, return an alert
+      if (!reason) {
+        alert("Please enter a reason.");
+        return;
+      }
+
+      // Push the new action into the actions array
+      actions.push({ type, reason, timestamp });
+
+      // Save the updated actions array to localStorage
+      localStorage.setItem("actions", JSON.stringify(actions));
+
+      // Clear the input field
+      document.getElementById("reason").value = '';
+
+      // Refresh the log display
+      displayLogs();
+    }
+
+    // Function to display the logs
+    function displayLogs() {
+      const logList = document.getElementById("logList");
+      logList.innerHTML = ""; // Clear the current logs
+
+      // Iterate over the actions and create log items
+      actions.forEach(action => {
+        const logItem = document.createElement("div");
+        logItem.classList.add("log-item");
+
+        logItem.innerHTML = `
+          <p><strong>Action:</strong> ${action.type}</p>
+          <p><strong>Reason:</strong> ${action.reason}</p>
+          <p><strong>Time:</strong> ${action.timestamp}</p>
+        `;
+
+        logList.appendChild(logItem);
+      });
+    }
+
+    // Display logs on page load
+    displayLogs();
+  </script>
+</body>
+</html>

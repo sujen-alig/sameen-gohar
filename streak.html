@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Right/Wrong Streaks</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      margin: 0;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #00e676;
+      margin-bottom: 20px;
+    }
+
+    .section {
+      background-color: #1e2a38;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    h2 {
+      border-bottom: 2px solid #00e676;
+      padding-bottom: 8px;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li {
+      padding: 10px;
+      margin: 8px 0;
+      background-color: #2d3e50;
+      border-left: 6px solid #00e676;
+      border-radius: 6px;
+    }
+
+    .back-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Right / Wrong Streak History</h1>
+
+  <div class="section">
+    <h2>✅ Right Streak</h2>
+    <ul id="rightList"></ul>
+  </div>
+
+  <div class="section">
+    <h2>❌ Wrong Streak</h2>
+    <ul id="wrongList"></ul>
+  </div>
+
+  <button class="back-btn" onclick="history.back()">⬅ Back</button>
+
+  <script>
+    const data = JSON.parse(localStorage.getItem("rw_streaks")) || [];
+
+    const rightList = document.getElementById("rightList");
+    const wrongList = document.getElementById("wrongList");
+
+    data.forEach(entry => {
+      const li = document.createElement("li");
+      li.textContent = `${entry.date} - ${entry.type}${entry.reason ? " - " + entry.reason : ""}`;
+      if (entry.type === "Right") {
+        rightList.appendChild(li);
+      } else if (entry.type === "Wrong") {
+        wrongList.appendChild(li);
+      }
+    });
+  </script>
+</body>
+</html>

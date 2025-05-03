@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      text-align: center;
+      padding: 50px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #333;
+    }
+
+    .chart-container {
+      max-width: 800px;
+      margin: 50px auto;
+    }
+
+    canvas {
+      max-width: 700px;
+      margin: 20px auto;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Analytics</h1>
+
+  <!-- Section for Success vs Failure (Pie Chart) -->
+  <div class="chart-container">
+    <div class="section-title">Success vs Failure</div>
+    <canvas id="successFailureChart"></canvas>
+  </div>
+
+  <!-- Section for Right vs Wrong (Pie Chart) -->
+  <div class="chart-container">
+    <div class="section-title">Right vs Wrong</div>
+    <canvas id="rightWrongChart"></canvas>
+  </div>
+
+  <script>
+    // Retrieve data from localStorage (extracted from reasons.html and rw_analytics.html)
+    let reasonsData = JSON.parse(localStorage.getItem("reasonsData")) || [];
+    let rwData = JSON.parse(localStorage.getItem("rw_streaks")) || [];
+
+    // Calculate Success and Failure counts from reasonsData
+    let successCount = reasonsData.filter(item => item.type === "Success").length;
+    let failureCount = reasonsData.filter(item => item.type === "Failure").length;
+
+    // Calculate Right and Wrong counts from rwData
+    let rightCount = rwData.filter(item => item.type === "Right").length;
+    let wrongCount = rwData.filter(item => item.type === "Wrong").length;
+
+    // Data for Success/Failure Pie Chart
+    const successFailureData = {
+      labels: ['Success', 'Failure'],
+      datasets: [{
+        label: 'Success/Failure Count',
+        data: [successCount, failureCount],
+        backgroundColor: ['#4CAF50', '#F44336'],
+        borderColor: ['#388E3C', '#D32F2F'],
+        borderWidth: 1
+      }]
+    };
+
+    // Data for Right/Wrong Pie Chart
+    const rightWrongData = {
+      labels: ['Right', 'Wrong'],
+      datasets: [{
+        label: 'Right/Wrong Count',
+        data: [rightCount, wrongCount],
+        backgroundColor: ['#4CAF50', '#F44336'],
+        borderColor: ['#388E3C', '#D32F2F'],
+        borderWidth: 1
+      }]
+    };
+
+    // Success vs Failure Pie Chart
+    const successFailureCtx = document.getElementById('successFailureChart').getContext('2d');
+    new Chart(successFailureCtx, {
+      type: 'pie',
+      data: successFailureData,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          tooltip: {
+            callbacks: {
+              label: function(tooltipItem) {
+                return tooltipItem.label + ': ' + tooltipItem.raw;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Right vs Wrong Pie Chart
+    const rightWrongCtx = document.getElementById('rightWrongChart').getContext('2d');
+    new Chart(rightWrongCtx, {
+      type: 'pie',
+      data: rightWrongData,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          tooltip: {
+            callbacks: {
+              label: function(tooltipItem) {
+                return tooltipItem.label + ': ' + tooltipItem.raw;
+              }
+            }
+          }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
