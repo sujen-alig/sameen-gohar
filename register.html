@@ -1,50 +1,86 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register</title>
+  <title>Register - Urge Control Dashboard</title>
   <style>
-    body { font-family: Arial; background: #f0f2f5; padding: 20px; }
-    .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
-    input, button { width: 100%; padding: 10px; margin: 8px 0; }
-    button { background: #28a745; color: white; border: none; }
-    button:hover { background: #218838; }
-    .link { text-align: center; margin-top: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .register-container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input[type="text"], input[type="password"], input[type="email"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #28a745;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #218838;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Register</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="registerUser()">Register</button>
-    <div class="link">
-      Already have an account? <a href="login.html">Login here</a>
-    </div>
+  <div class="register-container">
+    <h1>Register</h1>
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <button onclick="register()">Register</button>
+    <p style="color: #ccc; text-align: center;">Already registered? <a href="login.html" style="color: #28a745;">Login</a></p>
   </div>
 
   <script>
-    function registerUser() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const email = document.getElementById("email").value.trim();
+    function register() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const email = document.getElementById('email').value;
 
-      if (!username || !password || !email) {
-        alert("Please fill out all fields.");
+      // Check if username is already taken
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      if (users.some(u => u.username === username)) {
+        alert("Username already taken.");
         return;
       }
 
-      const newUser = { username, password, email };
-      let pending = JSON.parse(localStorage.getItem("pendingUsers")) || [];
-      if (pending.find(u => u.username === username)) {
-        alert("Username already pending approval.");
-        return;
-      }
+      // Save user to localStorage with pending approval
+      const newUser = {
+        username,
+        password,
+        email,
+        approved: false
+      };
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
 
-      pending.push(newUser);
-      localStorage.setItem("pendingUsers", JSON.stringify(pending));
-      alert("Registration sent for admin approval.");
+      alert("Registration successful. Awaiting admin approval.");
       window.location.href = "login.html";
     }
   </script>
