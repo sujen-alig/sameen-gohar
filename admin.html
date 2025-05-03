@@ -1,95 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel - Urge Control Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&display=swap">
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Roboto', sans-serif;
       background: linear-gradient(to right, #141e30, #243b55);
-      color: white;
+      color: #fff;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 50px;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+      padding: 20px;
     }
-    h1 {
-      margin-bottom: 30px;
+
+    .panel {
+      background: #2d3436;
+      width: 100%;
+      max-width: 900px;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     }
-    .user-list {
-      width: 80%;
-      max-width: 600px;
+
+    .panel h2 {
+      color: #00b894;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
       margin-top: 20px;
     }
-    .user {
-      background: rgba(0, 0, 0, 0.7);
-      padding: 15px;
-      margin: 10px 0;
-      border-radius: 5px;
+
+    table th, table td {
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #fff;
     }
-    button {
-      background-color: #28a745;
-      color: white;
-      padding: 10px;
-      border: none;
+
+    .approve-btn, .reject-btn {
+      padding: 6px 12px;
+      border-radius: 8px;
       cursor: pointer;
-      border-radius: 5px;
+      font-weight: bold;
+      transition: background 0.3s;
     }
-    button:hover {
-      background-color: #218838;
+
+    .approve-btn {
+      background-color: #00b894;
     }
-    .approve {
-      background-color: #007bff;
+
+    .approve-btn:hover {
+      background-color: #019875;
     }
-    .reject {
-      background-color: #dc3545;
+
+    .reject-btn {
+      background-color: #e74c3c;
+    }
+
+    .reject-btn:hover {
+      background-color: #c0392b;
+    }
+
+    .logout {
+      background-color: crimson;
+      padding: 12px 20px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .logout:hover {
+      background-color: #c0392b;
     }
   </style>
 </head>
 <body>
-  <h1>Admin Panel</h1>
-  <div class="user-list" id="user-list"></div>
+  <div class="panel">
+    <h2>Admin Panel - User Approvals</h2>
+
+    <table id="userTable">
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Password</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Users will be populated here -->
+      </tbody>
+    </table>
+
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
   <script>
-    // Load users from localStorage
-    function loadUsers() {
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      const userListDiv = document.getElementById("user-list");
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
-      users.forEach((user, index) => {
-        if (!user.approved) {
-          const userDiv = document.createElement("div");
-          userDiv.classList.add("user");
-          userDiv.innerHTML = `
-            <p><strong>Username:</strong> ${user.username}</p>
-            <p><strong>Email:</strong> ${user.email}</p>
-            <button class="approve" onclick="approveUser(${index})">Approve</button>
-            <button class="reject" onclick="rejectUser(${index})">Reject</button>
-          `;
-          userListDiv.appendChild(userDiv);
-        }
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Load the users from Firebase and display them in the table
+    function loadUsers() {
+      const tableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+
+      db.ref("approvals").once("value", (snapshot) => {
+        snapshot.forEach((childSnapshot) => {
+          const data = childSnapshot.val();
+          const row = tableBody.insertRow();
+
+          row.insertCell(0).textContent = data.email;
+          row.insertCell(1).textContent = data.password;
+          row.insertCell(2).textContent = data.approved ? "Approved" : "Pending";
+
+          const actionCell = row.insertCell(3);
+          if (!data.approved) {
+            const approveButton = document.createElement('button');
+            approveButton.textContent = "Approve";
+            approveButton.classList.add('approve-btn');
+            approveButton.onclick = () => approveUser(childSnapshot.key, data);
+
+            const rejectButton = document.createElement('button');
+            rejectButton.textContent = "Reject";
+            rejectButton.classList.add('reject-btn');
+            rejectButton.onclick = () => rejectUser(childSnapshot.key);
+
+            actionCell.appendChild(approveButton);
+            actionCell.appendChild(rejectButton);
+          } else {
+            actionCell.textContent = "Already Approved";
+          }
+        });
       });
     }
 
-    function approveUser(index) {
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      users[index].approved = true;
-      localStorage.setItem("users", JSON.stringify(users));
-      alert("User approved!");
-      loadUsers(); // Reload user list after approval
+    // Approve user
+    function approveUser(userId, data) {
+      db.ref("approvals").child(userId).update({
+        approved: true
+      }).then(() => {
+        alert("User approved!");
+        loadUsers(); // Reload the users list
+      });
     }
 
-    function rejectUser(index) {
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      users.splice(index, 1);
-      localStorage.setItem("users", JSON.stringify(users));
-      alert("User rejected!");
-      loadUsers(); // Reload user list after rejection
+    // Reject user
+    function rejectUser(userId) {
+      db.ref("approvals").child(userId).remove().then(() => {
+        alert("User rejected!");
+        loadUsers(); // Reload the users list
+      });
     }
 
-    loadUsers();
+    // Logout
+    function logout() {
+      window.location.href = "login.html"; // Redirect to login page
+    }
+
+    loadUsers(); // Load the users when the page is loaded
   </script>
 </body>
 </html>
-
