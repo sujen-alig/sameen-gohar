@@ -1,49 +1,85 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Login - Urge Control Dashboard</title>
   <style>
-    body { font-family: Arial; background: #f0f2f5; padding: 20px; }
-    .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
-    input, button { width: 100%; padding: 10px; margin: 8px 0; }
-    button { background: #007bff; color: white; border: none; }
-    button:hover { background: #0056b3; }
-    .link { text-align: center; margin-top: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #28a745;
+      border: none;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #218838;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Login</h2>
-    <input type="text" id="loginUser" placeholder="Username">
-    <input type="password" id="loginPass" placeholder="Password">
-    <button onclick="loginUser()">Login</button>
-    <div class="link">
-      New user? <a href="register.html">Register here</a>
-    </div>
+  <div class="login-container">
+    <h1>Login</h1>
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="login()">Login</button>
+    <p style="color: #ccc; text-align: center;">Not registered? <a href="register.html" style="color: #28a745;">Sign up</a></p>
   </div>
 
   <script>
-    function loginUser() {
-      const user = document.getElementById("loginUser").value.trim();
-      const pass = document.getElementById("loginPass").value.trim();
-
-      if (user === "sujen" && pass === "87654321") {
-        alert("Welcome Admin");
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      // Admin credentials
+      const adminUsername = "sujen";
+      const adminPassword = "87654321";
+      
+      // Retrieve approval status from localStorage
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      const user = users.find(u => u.username === username && u.password === password);
+      
+      if (username === adminUsername && password === adminPassword) {
+        // Redirect admin to the admin page
         window.location.href = "admin.html";
-        return;
-      }
-
-      const approved = JSON.parse(localStorage.getItem("approvedUsers")) || [];
-      const match = approved.find(u => u.username === user && u.password === pass);
-
-      if (match) {
-        alert("Login successful");
+      } else if (user && user.approved) {
+        // Redirect normal users to home page if approved
         window.location.href = "home.html";
       } else {
-        alert("Not approved or invalid credentials");
+        alert("Invalid credentials or account not approved.");
       }
     }
   </script>
 </body>
 </html>
+
