@@ -1,102 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&display=swap">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - MR Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Roboto', sans-serif;
-      background: linear-gradient(to right, #141e30, #243b55);
-      color: #fff;
+      background: linear-gradient(to right, #1f4037, #99f2c8);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
-
-    .form-container {
-      background: #2d3436;
+    .login-box {
+      background-color: white;
       padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-      max-width: 400px;
+      border-radius: 10px;
       width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
-
-    .form-container h2 {
-      margin-bottom: 20px;
-      color: #00b894;
+    h2 {
+      text-align: center;
+      color: #2d3436;
     }
-
     input, button {
       width: 100%;
       padding: 12px;
       margin-top: 10px;
-      border: none;
-      border-radius: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
-
-    input {
-      background: #dfe6e9;
-    }
-
     button {
       background-color: #00b894;
-      color: #000;
+      color: white;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
-
     button:hover {
       background-color: #019875;
     }
-
-    .message {
+    .error {
+      color: red;
+      text-align: center;
       margin-top: 10px;
-      font-size: 0.9rem;
-      color: #ff7675;
     }
   </style>
 </head>
 <body>
-  <div class="form-container">
-    <h2>User Login</h2>
-    <input type="email" id="email" placeholder="Enter your email" required />
-    <input type="password" id="password" placeholder="Enter your password" required />
-    <button onclick="loginUser()">Login</button>
-    <p class="message" id="msg"></p>
+  <div class="login-box">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div class="error" id="errorMsg"></div>
   </div>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
-  <!-- Firebase Config -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyClczr-VHpPkFgrPfOQJI5aL6-zL0lWOv8",
       authDomain: "sujen-2130a.firebaseapp.com",
-      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-      projectId: "
-sujen-2130a",
-      storageBucket: "sujen-2130a.firebasestorage.app",
+      projectId: "sujen-2130a",
+      storageBucket: "sujen-2130a.appspot.com",
       messagingSenderId: "818571217823",
-      appId: "1:818571217823:web:1231f1cfb38810c7d1cbaa"
+      appId: "1:818571217823:web:1231f1cfb38810c7d1cbaa",
+      databaseURL: "https://sujen-2130a-default-rtdb.firebaseio.com"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    function loginUser() {
+    function login() {
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
-      const msg = document.getElementById("msg");
+      const errorMsg = document.getElementById("errorMsg");
 
-      // Default admin check
-      if (email === "sujen@example.com" && password === "87654321") {
+      if (email === "sujen" && password === "87654321") {
         window.location.href = "admin.html";
         return;
       }
@@ -110,13 +95,12 @@ sujen-2130a",
             if (data.approved) {
               window.location.href = "home.html";
             } else {
-              msg.textContent = "Your account is not approved yet.";
+              errorMsg.textContent = "Your account is not approved yet.";
             }
           }
         });
-
         if (!found) {
-          msg.textContent = "Invalid email or password.";
+          errorMsg.textContent = "Invalid credentials.";
         }
       });
     }
