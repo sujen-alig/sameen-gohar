@@ -1,94 +1,47 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #141e30, #243b55);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .login-container {
-      background: #1b2838;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-      width: 300px;
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #00e676;
-    }
-
-    input[type="text"], input[type="password"] {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: none;
-      border-radius: 6px;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      background-color: #00e676;
-      border: none;
-      color: #000;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #00c853;
-    }
-
-    .error {
-      color: red;
-      text-align: center;
-      margin-top: 10px;
-    }
+    body { font-family: Arial; background: #f0f2f5; padding: 20px; }
+    .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    input, button { width: 100%; padding: 10px; margin: 8px 0; }
+    button { background: #007bff; color: white; border: none; }
+    button:hover { background: #0056b3; }
+    .link { text-align: center; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h2>User Login</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <div class="error" id="error"></div>
+  <div class="container">
+    <h2>Login</h2>
+    <input type="text" id="loginUser" placeholder="Username">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button onclick="loginUser()">Login</button>
+    <div class="link">
+      New user? <a href="register.html">Register here</a>
+    </div>
   </div>
 
   <script>
-    function login() {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const errorDiv = document.getElementById('error');
+    function loginUser() {
+      const user = document.getElementById("loginUser").value.trim();
+      const pass = document.getElementById("loginPass").value.trim();
 
-      if (username === 'sujen' && password === '87654321') {
-        window.location.href = 'admin.html';
+      if (user === "sujen" && pass === "87654321") {
+        alert("Welcome Admin");
+        window.location.href = "admin.html";
         return;
       }
 
-      const approvals = JSON.parse(localStorage.getItem('approvals')) || [];
-      const matched = approvals.find(u => u.username === username && u.password === password && u.approved);
+      const approved = JSON.parse(localStorage.getItem("approvedUsers")) || [];
+      const match = approved.find(u => u.username === user && u.password === pass);
 
-      if (matched) {
-        localStorage.setItem('currentUser', JSON.stringify(matched));
-        window.location.href = 'home.html';
+      if (match) {
+        alert("Login successful");
+        window.location.href = "home.html";
       } else {
-        errorDiv.textContent = 'Invalid credentials or not approved yet.';
+        alert("Not approved or invalid credentials");
       }
     }
   </script>
