@@ -1,85 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Urge Control Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&display=swap">
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Roboto', sans-serif;
       background: linear-gradient(to right, #141e30, #243b55);
-      color: white;
+      color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
     }
-    .login-container {
-      background: rgba(0, 0, 0, 0.7);
+
+    .form-container {
+      background: #2d3436;
       padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    input[type="text"], input[type="password"] {
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      max-width: 400px;
       width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
     }
-    button {
+
+    .form-container h2 {
+      margin-bottom: 20px;
+      color: #00b894;
+    }
+
+    input, button {
       width: 100%;
       padding: 12px;
-      background-color: #28a745;
+      margin-top: 10px;
       border: none;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      border-radius: 5px;
+      border-radius: 8px;
     }
+
+    input {
+      background: #dfe6e9;
+    }
+
+    button {
+      background-color: #00b894;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
     button:hover {
-      background-color: #218838;
+      background-color: #019875;
+    }
+
+    .message {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #ff7675;
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h1>Login</h1>
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button onclick="login()">Login</button>
-    <p style="color: #ccc; text-align: center;">Not registered? <a href="register.html" style="color: #28a745;">Sign up</a></p>
+  <div class="form-container">
+    <h2>User Login</h2>
+    <input type="email" id="email" placeholder="Enter your email" required />
+    <input type="password" id="password" placeholder="Enter your password" required />
+    <button onclick="loginUser()">Login</button>
+    <p class="message" id="msg"></p>
   </div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+  <!-- Firebase Config -->
   <script>
-    function login() {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      
-      // Admin credentials
-      const adminUsername = "sujen";
-      const adminPassword = "87654321";
-      
-      // Retrieve approval status from localStorage
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      const user = users.find(u => u.username === username && u.password === password);
-      
-      if (username === adminUsername && password === adminPassword) {
-        // Redirect admin to the admin page
+    const firebaseConfig = {
+      apiKey: "AIzaSyClczr-VHpPkFgrPfOQJI5aL6-zL0lWOv8",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+      projectId: "
+sujen-2130a",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "1:818571217823:web:1231f1cfb38810c7d1cbaa"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function loginUser() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const msg = document.getElementById("msg");
+
+      // Default admin check
+      if (email === "sujen@example.com" && password === "87654321") {
         window.location.href = "admin.html";
-      } else if (user && user.approved) {
-        // Redirect normal users to home page if approved
-        window.location.href = "home.html";
-      } else {
-        alert("Invalid credentials or account not approved.");
+        return;
       }
+
+      db.ref("approvals").once("value", (snapshot) => {
+        let found = false;
+        snapshot.forEach((child) => {
+          const data = child.val();
+          if (data.email === email && data.password === password) {
+            found = true;
+            if (data.approved) {
+              window.location.href = "home.html";
+            } else {
+              msg.textContent = "Your account is not approved yet.";
+            }
+          }
+        });
+
+        if (!found) {
+          msg.textContent = "Invalid email or password.";
+        }
+      });
     }
   </script>
 </body>
 </html>
-
