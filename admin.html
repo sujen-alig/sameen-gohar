@@ -1,48 +1,94 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel</title>
+  <title>Admin Panel - Urge Control Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 50px;
+    }
+    h1 {
+      margin-bottom: 30px;
+    }
+    .user-list {
+      width: 80%;
+      max-width: 600px;
+      margin-top: 20px;
+    }
+    .user {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .approve {
+      background-color: #007bff;
+    }
+    .reject {
+      background-color: #dc3545;
+    }
+  </style>
 </head>
 <body>
-  <h2>Pending Registrations</h2>
-  <div id="pending-list"></div>
+  <h1>Admin Panel</h1>
+  <div class="user-list" id="user-list"></div>
 
   <script>
-    function loadPendingUsers() {
-      const pending = JSON.parse(localStorage.getItem("pendingUsers")) || [];
-      const container = document.getElementById("pending-list");
-      container.innerHTML = "";
+    // Load users from localStorage
+    function loadUsers() {
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      const userListDiv = document.getElementById("user-list");
 
-      pending.forEach((user, index) => {
-        const div = document.createElement("div");
-        div.innerHTML = `
-          <p><strong>${user.username}</strong> (${user.email})</p>
-          <button onclick="approveUser(${index})">Approve</button>
-          <button onclick="removeUser(${index})">Reject</button>
-        `;
-        container.appendChild(div);
+      users.forEach((user, index) => {
+        if (!user.approved) {
+          const userDiv = document.createElement("div");
+          userDiv.classList.add("user");
+          userDiv.innerHTML = `
+            <p><strong>Username:</strong> ${user.username}</p>
+            <p><strong>Email:</strong> ${user.email}</p>
+            <button class="approve" onclick="approveUser(${index})">Approve</button>
+            <button class="reject" onclick="rejectUser(${index})">Reject</button>
+          `;
+          userListDiv.appendChild(userDiv);
+        }
       });
     }
 
     function approveUser(index) {
-      let pending = JSON.parse(localStorage.getItem("pendingUsers")) || [];
-      const user = pending.splice(index, 1)[0];
-      let approved = JSON.parse(localStorage.getItem("approvedUsers")) || [];
-      approved.push(user);
-      localStorage.setItem("approvedUsers", JSON.stringify(approved));
-      localStorage.setItem("pendingUsers", JSON.stringify(pending));
-      loadPendingUsers();
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      users[index].approved = true;
+      localStorage.setItem("users", JSON.stringify(users));
+      alert("User approved!");
+      loadUsers(); // Reload user list after approval
     }
 
-    function removeUser(index) {
-      let pending = JSON.parse(localStorage.getItem("pendingUsers")) || [];
-      pending.splice(index, 1);
-      localStorage.setItem("pendingUsers", JSON.stringify(pending));
-      loadPendingUsers();
+    function rejectUser(index) {
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      users.splice(index, 1);
+      localStorage.setItem("users", JSON.stringify(users));
+      alert("User rejected!");
+      loadUsers(); // Reload user list after rejection
     }
 
-    loadPendingUsers();
+    loadUsers();
   </script>
 </body>
 </html>
