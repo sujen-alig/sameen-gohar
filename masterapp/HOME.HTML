@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Control Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="dashboard">
+        <header>
+            <h1>Welcome, <span id="username">User</span></h1>
+        </header>
+
+        <!-- Streak Progress -->
+        <section class="progress-section">
+            <h2>Current Streak</h2>
+            <div id="streak-progress-bar" class="progress-bar"></div>
+            <p id="streak-text">You've been clean for <span id="clean-days">0</span> days!</p>
+        </section>
+
+        <!-- Failure Stats Section -->
+        <section class="failure-stats">
+            <h2>Failure Reasons</h2>
+            <div id="failure-reasons">
+                <!-- Dynamic failure reasons will appear here -->
+            </div>
+        </section>
+
+        <!-- Goal Progress Section -->
+        <section class="goal-progress">
+            <h2>Your Goal Progress</h2>
+            <div id="goal-progress-bar" class="progress-bar"></div>
+            <p>Current Goal: <span id="current-goal">7-Day Clean</span></p>
+        </section>
+
+        <!-- Motivation Section -->
+        <section class="motivation-section">
+            <h2>Today's Motivation</h2>
+            <p id="motivation-quote">"You are stronger than you think!"</p>
+        </section>
+
+        <!-- Emotion Log Section -->
+        <section class="emotion-log">
+            <h2>Emotion Log</h2>
+            <button id="add-emotion">Log Emotion</button>
+            <div id="emotion-log-container">
+                <!-- Emotion logs will be displayed here -->
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section class="settings">
+            <button id="change-settings">Change Layout</button>
+        </section>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+
+</html>

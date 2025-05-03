@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Right/Wrong Analytics</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: white;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #60a5fa;
+      margin-bottom: 30px;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .right-btn {
+      background: #10b981;
+      color: white;
+    }
+
+    .wrong-btn {
+      background: #ef4444;
+      color: white;
+    }
+
+    .right-btn:hover {
+      background: #059669;
+    }
+
+    .wrong-btn:hover {
+      background: #dc2626;
+    }
+
+    .entry {
+      background: #1e293b;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .back-btn {
+      background: crimson;
+      float: right;
+      margin-top: 20px;
+    }
+
+    .back-btn:hover {
+      background: darkred;
+    }
+
+    #logs {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧭 Right / Wrong Analytics</h1>
+
+  <button class="right-btn" onclick="markRight()">✅ Mark Right</button>
+  <button class="wrong-btn" onclick="markWrong()">❌ Mark Wrong</button>
+
+  <div id="logs"></div>
+
+  <button class="back-btn" onclick="window.location.href='index.html'">⬅ Back</button>
+
+  <script>
+    const key = "rwData";
+
+    function loadData() {
+      return JSON.parse(localStorage.getItem(key)) || [];
+    }
+
+    function saveData(data) {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    function markRight() {
+      const today = new Date().toDateString();
+      const data = loadData();
+
+      if (data.find(entry => entry.type === "Right" && new Date(entry.time).toDateString() === today)) {
+        alert("You have already marked 'Right' for today.");
+        return;
+      }
+
+      const entry = { type: "Right", time: new Date().toISOString() };
+      data.push(entry);
+      saveData(data);
+      updateStreak(entry);
+      displayLogs();
+    }
+
+    function markWrong() {
+      const today = new Date().toDateString();
+      const data = loadData();
+
+      if (data.find(entry => entry.type === "Wrong" && new Date(entry.time).toDateString() === today)) {
+        alert("You have already marked 'Wrong' for today.");
+        return;
+      }
+
+      const reason = prompt("Enter reason for Wrong:");
+      if (!reason) return;
+
+      const entry = { type: "Wrong", reason: reason, time: new Date().toISOString() };
+      data.push(entry);
+      saveData(data);
+      updateStreak(entry);
+      displayLogs();
+    }
+
+    function updateStreak(entry) {
+      let streakData = JSON.parse(localStorage.getItem("rwStreaks")) || [];
+      streakData.push(entry);
+      localStorage.setItem("rwStreaks", JSON.stringify(streakData));
+    }
+
+    function displayLogs() {
+      const data = loadData();
+      const container = document.getElementById("logs");
+      container.innerHTML = "";
+
+      data.slice().reverse().forEach(entry => {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.innerHTML = `
+          <strong>${entry.type}</strong><br>
+          ${entry.reason ? `<em>Reason:</em> ${entry.reason}<br>` : ''}
+          <small>${new Date(entry.time).toLocaleString()}</small>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    displayLogs();
+  </script>
+
+</body>
+</html>
+
+

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Summary Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #121212;
+      color: #ffffff;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      color: #00e5ff;
+      margin-bottom: 30px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: #1f1f1f;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    .card h2 {
+      font-size: 2rem;
+      margin: 10px 0;
+    }
+
+    .card.success { border-left: 6px solid #00e676; }
+    .card.failure { border-left: 6px solid #ff1744; }
+    .card.urge-success { border-left: 6px solid #29b6f6; }
+    .card.urge-failure { border-left: 6px solid #f50057; }
+
+    canvas {
+      display: block;
+      margin: 0 auto 30px auto;
+      max-width: 500px;
+      width: 100%;
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .back-btn {
+      display: block;
+      text-align: center;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background: #2196f3;
+      color: white;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .back-btn:hover {
+      background: #1565c0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📊 Self-Control Summary</h1>
+
+  <div class="cards">
+    <div class="card success">
+      <h2 id="successCount">0</h2>
+      <p>✅ Total Success</p>
+    </div>
+    <div class="card failure">
+      <h2 id="failureCount">0</h2>
+      <p>❌ Total Failure</p>
+    </div>
+    <div class="card urge-success">
+      <h2 id="urgeSuccessCount">0</h2>
+      <p>💪 Urge Success</p>
+    </div>
+    <div class="card urge-failure">
+      <h2 id="urgeFailureCount">0</h2>
+      <p>😓 Urge Failure</p>
+    </div>
+  </div>
+
+  <canvas id="summaryChart" width="400" height="400"></canvas>
+
+  <a class="back-btn" href="index.html">⬅ Back to Dashboard</a>
+
+  <script>
+    const ctx = document.getElementById('summaryChart').getContext('2d');
+    const successCount = document.getElementById("successCount");
+    const failureCount = document.getElementById("failureCount");
+    const urgeSuccessCount = document.getElementById("urgeSuccessCount");
+    const urgeFailureCount = document.getElementById("urgeFailureCount");
+
+    function updateSummary() {
+      const allData = JSON.parse(localStorage.getItem("urges")) || [];
+
+      let success = 0, failure = 0, urgeSuccess = 0, urgeFailure = 0;
+
+      allData.forEach(item => {
+        if (item.type === "Success") success++;
+        else if (item.type === "Failure") failure++;
+        else if (item.type === "Urge-Success") urgeSuccess++;
+        else if (item.type === "Urge-Failure") urgeFailure++;
+      });
+
+      successCount.innerText = success;
+      failureCount.innerText = failure;
+      urgeSuccessCount.innerText = urgeSuccess;
+      urgeFailureCount.innerText = urgeFailure;
+
+      drawChart(success, failure, urgeSuccess, urgeFailure);
+    }
+
+    function drawChart(success, failure, urgeSuccess, urgeFailure) {
+      const canvas = document.getElementById("summaryChart");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const total = success + failure + urgeSuccess + urgeFailure;
+      if (total === 0) {
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.font = "20px Arial";
+        ctx.fillText("No data to display.", canvas.width / 2, canvas.height / 2);
+        return;
+      }
+
+      const colors = ["#00e676", "#ff1744", "#29b6f6", "#f50057"];
+      const labels = ["Success", "Failure", "Urge Success", "Urge Failure"];
+      const values = [success, failure, urgeSuccess, urgeFailure];
+      const angles = values.map(v => (v / total) * 2 * Math.PI);
+
+      let startAngle = 0;
+      for (let i = 0; i < angles.length; i++) {
+        ctx.beginPath();
+        ctx.moveTo(200, 200);
+        ctx.arc(200, 200, 150, startAngle, startAngle + angles[i]);
+        ctx.closePath();
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+
+        // Add label
+        const midAngle = startAngle + angles[i] / 2;
+        const x = 200 + Math.cos(midAngle) * 120;
+        const y = 200 + Math.sin(midAngle) * 120;
+        ctx.fillStyle = "#fff";
+        ctx.font = "14px Arial";
+        ctx.fillText(`${labels[i]} (${values[i]})`, x - 30, y);
+
+        startAngle += angles[i];
+      }
+    }
+
+    updateSummary();
+  </script>
+</body>
+</html>

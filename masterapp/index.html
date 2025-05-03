@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Urge Control Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2.8rem;
+      color: #00e676;
+      text-shadow: 2px 2px #000;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1000px;
+    }
+
+    button {
+      background-color: #2c3e50;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 18px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s, background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #34495e;
+      transform: translateY(-3px);
+    }
+
+    .stats {
+      margin-top: 30px;
+      font-size: 1.1rem;
+      color: #fff;
+      background-color: #1b2838;
+      padding: 15px 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .logout {
+      margin-top: 40px;
+      background-color: crimson;
+    }
+
+    .backup {
+      background-color: #007bff;
+    }
+
+    .backup:hover {
+      background-color: #0056b3;
+    }
+
+    .reset {
+      background-color: #f39c12;
+    }
+
+    .reset:hover {
+      background-color: #e67e22;
+    }
+  </style>
+</head>
+<body>
+  <h1>Urge Control Dashboard</h1>
+
+  <div class="dashboard">
+    <button onclick="goTo('add-urge.html')">➕ Add Urge</button>
+    <button onclick="goTo('urges.html')">📘 View Urges</button>
+    <button onclick="goTo('reasons.html')">📋 View Reasons</button>
+    <button onclick="goTo('analytics.html')">📊 Analytics</button>
+    <button onclick="goTo('summary.html')">🧠 Summary</button>
+    <button onclick="goTo('rw-analytics.html')">📈 Right & Wrong Analytics</button>
+    <button onclick="goTo('streak.html')">🏆 Streak Tracker</button>
+    <button onclick="alertTotal('Success')">✅ Total Success</button>
+    <button onclick="alertTotal('Failure')">❌ Total Failure</button>
+    <button class="backup" onclick="downloadBackup()">💾 Backup Data</button>
+    <button class="reset" onclick="resetData()">🔄 Reset Data</button>
+  </div>
+
+  <div class="stats" id="totals">
+    Loading stats...
+  </div>
+
+  <button class="logout" onclick="logout()">🚪 Logout</button>
+
+  <script>
+    function goTo(page) {
+      window.location.href = page;
+    }
+
+    function logout() {
+      if (confirm("Are you sure you want to logout?")) {
+        window.location.href = "login.html"; // Replace with your actual login page
+      }
+    }
+
+    function alertTotal(type) {
+      const urges = JSON.parse(localStorage.getItem("urges")) || [];
+      const count = urges.filter(u => u.type === type).length;
+      alert(`Total ${type}: ${count}`);
+    }
+
+    function loadTotals() {
+      const urges = JSON.parse(localStorage.getItem("urges")) || [];
+      const success = urges.filter(u => u.type === "Success").length;
+      const failure = urges.filter(u => u.type === "Failure").length;
+      const total = urges.length;
+
+      document.getElementById("totals").innerHTML = ` 
+        <strong>Total:</strong> ${total} | 
+        ✅ Success: ${success} | 
+        ❌ Failure: ${failure}
+      `;
+    }
+
+    function downloadBackup() {
+      const urges = localStorage.getItem("urges") || "[]";
+      const blob = new Blob([urges], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "urge-backup-" + new Date().toISOString() + ".json";
+      link.click();
+    }
+
+    function resetData() {
+      if (confirm("Are you sure you want to reset all data? This action cannot be undone.")) {
+        localStorage.removeItem("urges");
+        loadTotals();
+        alert("Data has been reset.");
+      }
+    }
+
+    loadTotals();
+  </script>
+</body>
+</html>
