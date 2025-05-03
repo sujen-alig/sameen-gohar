@@ -1,121 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - MR Urge Tracker</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
   <style>
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #1e3c72, #2a5298);
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      color: #fff;
+      margin: 0;
     }
 
     .login-container {
-      background-color: #1c1c1c;
-      padding: 30px 40px;
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
+      background: #1b2838;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      width: 300px;
     }
 
     h2 {
-      margin-bottom: 25px;
+      text-align: center;
+      margin-bottom: 20px;
       color: #00e676;
     }
 
-    input[type="text"],
-    input[type="password"] {
+    input[type="text"], input[type="password"] {
       width: 100%;
-      padding: 12px 15px;
+      padding: 10px;
       margin: 10px 0;
       border: none;
-      border-radius: 8px;
-      font-size: 1rem;
+      border-radius: 6px;
     }
 
     button {
       width: 100%;
-      background-color: #00bcd4;
-      color: white;
+      padding: 10px;
+      background-color: #00e676;
       border: none;
-      padding: 12px;
-      font-size: 1rem;
-      border-radius: 8px;
+      color: #000;
+      font-weight: bold;
+      border-radius: 6px;
       cursor: pointer;
-      margin-top: 15px;
       transition: background-color 0.3s ease;
     }
 
     button:hover {
-      background-color: #008c9e;
+      background-color: #00c853;
     }
 
-    .register-link {
-      margin-top: 20px;
-      display: block;
-      font-size: 0.9rem;
-      color: #ccc;
-    }
-
-    .register-link a {
-      color: #00e676;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .register-link a:hover {
-      text-decoration: underline;
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-
   <div class="login-container">
-    <h2>Login to MR Dashboard</h2>
-    <form id="login-form">
-      <input type="text" id="username" placeholder="Username" required />
-      <input type="password" id="password" placeholder="Password" required />
-      <button type="submit">Login</button>
-    </form>
-    <div class="register-link">
-      Don't have an account? <a href="register.html">Register Here</a>
-    </div>
+    <h2>User Login</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div class="error" id="error"></div>
   </div>
 
   <script>
-    document.getElementById("login-form").addEventListener("submit", function(e) {
-      e.preventDefault();
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('error');
 
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value;
-
-      // Admin login check
-      if (username === "sujen" && password === "87654321") {
-        alert("Welcome Admin!");
-        window.location.href = "admin.html";
+      if (username === 'sujen' && password === '87654321') {
+        window.location.href = 'admin.html';
         return;
       }
 
-      // Check approved users
-      const approvedUsers = JSON.parse(localStorage.getItem("approvedUsers")) || [];
-      const foundUser = approvedUsers.find(user => user.username === username && user.password === password);
+      const approvals = JSON.parse(localStorage.getItem('approvals')) || [];
+      const matched = approvals.find(u => u.username === username && u.password === password && u.approved);
 
-      if (foundUser) {
-        alert("Login successful!");
-        window.location.href = "index.html";
+      if (matched) {
+        localStorage.setItem('currentUser', JSON.stringify(matched));
+        window.location.href = 'home.html';
       } else {
-        alert("Invalid credentials or you are not approved yet.");
+        errorDiv.textContent = 'Invalid credentials or not approved yet.';
       }
-    });
+    }
   </script>
-
 </body>
 </html>
